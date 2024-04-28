@@ -26,7 +26,7 @@ public class User {
     Long chatId;
 
     @Column(nullable = false)
-    String firstName;
+    String userName;
 
     @Column(nullable = false)
     LocalDateTime registeredAt;
