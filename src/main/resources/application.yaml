@@ -1,6 +1,6 @@
 bot:
   token: ${BOT_TOKEN}
-  name: "@ReminderManagerBot"
+  username: "@ReminderManagerBot"
   url: https://3d80-185-154-73-126.ngrok-free.app
 
 spring:
@@ -9,3 +9,7 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql=true
+    ddl-auto=update
