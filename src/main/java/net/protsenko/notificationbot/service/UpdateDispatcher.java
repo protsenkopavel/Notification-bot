@@ -14,15 +14,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class UpdateDispatcher {
 
     CommandHandlerImpl commandHandler;
+    CallbackCommandHandlerImpl callbackCommandHandler;
 
-    public UpdateDispatcher(CommandHandlerImpl commandHandler) {
+    public UpdateDispatcher(CommandHandlerImpl commandHandler, CallbackCommandHandlerImpl callbackCommandHandler) {
         this.commandHandler = commandHandler;
+        this.callbackCommandHandler = callbackCommandHandler;
     }
 
     public BotApiMethod<?> distribute(Update update, Bot bot) {
 
         try {
             if (update.hasMessage() && update.getMessage().getText().startsWith("/")) return commandHandler.answer(update, bot);
+            if (update.hasCallbackQuery() && update.getMessage().getText().startsWith("/")) return callbackCommandHandler.answer(update, bot);
             log.info("Неподдерживаемая команда: {}", update);
         } catch (Exception e) {
             //TelegramApiException e

@@ -8,38 +8,37 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.interfaces.BotApiObject;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CommandHandlerImpl implements Handler {
-
+public class CallbackCommandHandlerImpl implements Handler{
     KeyboardFactory keyboardFactory;
     UserService userService;
 
-    public CommandHandlerImpl(KeyboardFactory keyboardFactory, UserService userService) {
+    public CallbackCommandHandlerImpl(KeyboardFactory keyboardFactory, UserService userService) {
         this.keyboardFactory = keyboardFactory;
         this.userService = userService;
     }
 
     @Override
     public BotApiMethod<?> answer(BotApiObject object, Bot bot) {
-        Message message = (Message) object;
-        String command = message.getText();
+        var query = (CallbackQuery) object;
+        String command = query.getData();
 
         switch (Commands.valueOf(command)) {
             case START -> {
-                return start(message);
+                return start(query);
             }
             case HELP -> {
-                return help(message);
+                return help(query);
             }
 
             case FEEDBACK -> {
-                return feedback(message);
+                return feedback(query);
             }
 
             case CREATE_NOTIFICATION -> {
@@ -51,22 +50,22 @@ public class CommandHandlerImpl implements Handler {
             }
 
             default -> {
-                return defaultAnswer(message);
+                return defaultAnswer(query);
             }
         }
         return null;
     }
 
-    private BotApiMethod<?> start(Message message) {
+    private BotApiMethod<?> start(CallbackQuery query) {
         userService.checkUser(
                 User.builder()
-                        .chatId(message.getChatId())
+                        .chatId(query.getMessage().getChatId())
                         .registeredAt(LocalDateTime.now())
-                        .userName(message.getFrom().getUserName())
+                        .userName(query.getFrom().getUserName())
                         .build());
 
         return SendMessage.builder()
-                .chatId(message.getChatId())
+                .chatId(query.getMessage().getChatId())
                 .text("""
                          👋🏻 Приветствую в боте-напоминалке, инструменте для создания напоминаний.
                         \s
@@ -82,17 +81,17 @@ public class CommandHandlerImpl implements Handler {
                 .build();
     }
 
-    private BotApiMethod<?> feedback(Message message) {
+    private BotApiMethod<?> feedback(CallbackQuery query) {
         return null;
     }
 
-    private BotApiMethod<?> help(Message message) {
+    private BotApiMethod<?> help(CallbackQuery query) {
         return null;
     }
 
-    private BotApiMethod<?> defaultAnswer(Message message) {
+    private BotApiMethod<?> defaultAnswer(CallbackQuery query) {
         return SendMessage.builder()
-                .chatId(message.getChatId())
+                .chatId(query.getMessage().getChatId())
                 .text("Неподдерживаемая команда")
                 .build();
     }

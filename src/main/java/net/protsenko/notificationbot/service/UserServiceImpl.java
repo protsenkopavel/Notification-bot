@@ -17,9 +17,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(User user) {
+    public void checkUser(User user) {
         if (user != null) {
-            userRepository.save(user);
+            if (!userRepository.existsById(user.getChatId())) {
+                userRepository.save(user);
+            }
         }
     }
 }
